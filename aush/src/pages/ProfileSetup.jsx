@@ -1,11 +1,29 @@
 import { useState } from "react";
-import { Input } from "../components/Input";
-import { Select } from "../components/Select";
-import { Checkbox } from "../components/Checkbox";
-import { ProgressBar } from "../components/ProgressBar";
+import Input from "../components/Input";
+import Select from "../components/Select";
+import Checkbox from "../components/Checkbox";
+import ProgressBar from "../components/ProgressBar";
 
 export default function ProfileSetup() {
   const [step, setStep] = useState(1);
+  const [formData, setFormData] = useState({
+    fullName: "",
+    phoneNumber: "",
+    dob: "",
+    email: "",
+    gender: "",
+    address: "",
+    occupation: "",
+    emergencyContact: "",
+  });
+
+  const totalFields = Object.keys(formData).length;
+  const completedFields = Object.values(formData).filter(value => value !== "").length;
+  const progress = (completedFields / totalFields) * 100;
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   return (
     <div className="min-h-screen bg-[#F5FAF5] flex items-center justify-center p-4">
@@ -15,19 +33,18 @@ export default function ProfileSetup() {
           Add your details now so that it's quicker to book your appointment later.
         </p>
 
-        {/* Progress Bar */}
-        <ProgressBar step={step} />
+        <ProgressBar progress={progress} />
 
         {step === 1 ? (
           <div className="grid grid-cols-2 gap-6">
-            <Input label="Full Name" placeholder="Buragana Uday Kumar" />
-            <Input label="Phone Number" placeholder="+91 9493153405" />
-            <Input label="Date of Birth" type="date" placeholder="DD/MM/YYYY" />
-            <Input label="Email ID" placeholder="Aushadam" />
-            <Select label="Gender" options={["Select Gender", "Male", "Female", "Other"]} />
-            <Input label="Postal Address" placeholder="Aushadam" />
-            <Input label="Occupation" placeholder="Aushadam" />
-            <Input label="Emergency Contact Number" placeholder="Aushadam" />
+            <Input label="Full Name" name="fullName" placeholder="Enter your name" onChange={handleChange} />
+            <Input label="Phone Number" name="phoneNumber" placeholder="+91 9493153405" onChange={handleChange} />
+            <Input label="Date of Birth" name="dob" type="date" placeholder="DD/MM/YYYY" onChange={handleChange} />
+            <Input label="Email ID" name="email" placeholder="Enter your email" onChange={handleChange} />
+            <Select label="Gender" name="gender" options={["Select Gender", "Male", "Female", "Other"]} onChange={handleChange} />
+            <Input label="Postal Address" name="address" placeholder="Enter your address" onChange={handleChange} />
+            <Input label="Occupation" name="occupation" placeholder="Enter your occupation" onChange={handleChange} />
+            <Input label="Emergency Contact Number" name="emergencyContact" placeholder="Enter emergency contact" onChange={handleChange} />
           </div>
         ) : (
           <div className="grid gap-6">
@@ -35,31 +52,22 @@ export default function ProfileSetup() {
               <p className="font-semibold text-gray-900">Select your present health issues</p>
               <div className="flex flex-wrap gap-3 mt-2">
                 {["Diabetes", "Gastritis", "High Blood Pressure", "Low Blood Pressure"].map((issue) => (
-                  <Checkbox key={issue} label={issue} />
+                  <Checkbox key={issue} label={issue} name="healthIssues" onChange={handleChange} />
                 ))}
-                <button className="text-green-600 border border-green-600 px-3 py-1 rounded-lg">Add more</button>
               </div>
             </div>
             <div>
               <p className="font-semibold text-gray-900">Are you on medication?</p>
               <div className="flex gap-6 mt-2">
-                <Checkbox label="Yes" />
-                <Checkbox label="No" />
+                <Checkbox label="Yes" name="medication" onChange={handleChange} />
+                <Checkbox label="No" name="medication" onChange={handleChange} />
               </div>
             </div>
             <div>
               <p className="font-semibold text-gray-900">Do you have any allergies?</p>
               <div className="flex gap-6 mt-2">
-                <Checkbox label="Yes" />
-                <Checkbox label="No" />
-              </div>
-            </div>
-            <div>
-              <p className="font-semibold text-gray-900">Select your Lifestyle Habits</p>
-              <div className="flex flex-wrap gap-3 mt-2">
-                {["Yoga", "Exercises", "Meditation", "Smoking", "Alcohol consumption"].map((habit) => (
-                  <Checkbox key={habit} label={habit} />
-                ))}
+                <Checkbox label="Yes" name="allergies" onChange={handleChange} />
+                <Checkbox label="No" name="allergies" onChange={handleChange} />
               </div>
             </div>
           </div>
