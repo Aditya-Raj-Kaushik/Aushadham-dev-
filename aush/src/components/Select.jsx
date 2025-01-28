@@ -1,0 +1,15 @@
+export function Select({ label, options }) {
+    return (
+      <div className="flex flex-col">
+        {label && <label className="text-gray-700 font-medium mb-1">{label}</label>}
+        <select className="p-2 border border-gray-300 rounded-lg w-full">
+          {options.map((option, index) => (
+            <option key={index} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+      </div>
+    );
+  }
+  
