@@ -15,14 +15,49 @@ export default function ProfileSetup() {
     address: "",
     occupation: "",
     emergencyContact: "",
+    healthIssues: [],
+    medication: "",
+    allergies: "",
   });
 
+  const stepFields = {
+    1: ["fullName", "phoneNumber", "dob", "email", "gender", "address", "occupation", "emergencyContact"],
+    2: ["healthIssues", "medication", "allergies"],
+  };
+
   const totalFields = Object.keys(formData).length;
-  const completedFields = Object.values(formData).filter(value => value !== "").length;
+  const completedFields = Object.values(formData).filter((value) =>
+    Array.isArray(value) ? value.length > 0 : value !== ""
+  ).length;
   const progress = (completedFields / totalFields) * 100;
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value, type, checked } = e.target;
+    if (type === "checkbox" && name === "healthIssues") {
+      setFormData((prevData) => ({
+        ...prevData,
+        healthIssues: checked
+          ? [...prevData.healthIssues, value]
+          : prevData.healthIssues.filter((issue) => issue !== value),
+      }));
+    } else {
+      setFormData({ ...formData, [name]: type === "checkbox" ? (checked ? value : "") : value });
+    }
+  };
+
+  const validateForm = () => {
+    return stepFields[step].every((field) => {
+      const value = formData[field];
+      return Array.isArray(value) ? value.length > 0 : value !== "";
+    });
+  };
+
+  const handleNext = () => {
+    if (validateForm()) {
+      setStep(step + 1);
+    } else {
+      alert("Please fill all fields before proceeding.");
+    }
   };
 
   return (
@@ -52,22 +87,22 @@ export default function ProfileSetup() {
               <p className="font-semibold text-gray-900">Select your present health issues</p>
               <div className="flex flex-wrap gap-3 mt-2">
                 {["Diabetes", "Gastritis", "High Blood Pressure", "Low Blood Pressure"].map((issue) => (
-                  <Checkbox key={issue} label={issue} name="healthIssues" onChange={handleChange} />
+                  <Checkbox key={issue} label={issue} name="healthIssues" value={issue} onChange={handleChange} />
                 ))}
               </div>
             </div>
             <div>
               <p className="font-semibold text-gray-900">Are you on medication?</p>
               <div className="flex gap-6 mt-2">
-                <Checkbox label="Yes" name="medication" onChange={handleChange} />
-                <Checkbox label="No" name="medication" onChange={handleChange} />
+                <Checkbox label="Yes" name="medication" value="Yes" onChange={handleChange} />
+                <Checkbox label="No" name="medication" value="No" onChange={handleChange} />
               </div>
             </div>
             <div>
               <p className="font-semibold text-gray-900">Do you have any allergies?</p>
               <div className="flex gap-6 mt-2">
-                <Checkbox label="Yes" name="allergies" onChange={handleChange} />
-                <Checkbox label="No" name="allergies" onChange={handleChange} />
+                <Checkbox label="Yes" name="allergies" value="Yes" onChange={handleChange} />
+                <Checkbox label="No" name="allergies" value="No" onChange={handleChange} />
               </div>
             </div>
           </div>
@@ -75,9 +110,18 @@ export default function ProfileSetup() {
 
         <div className="flex justify-between mt-8">
           {step > 1 && (
-            <button onClick={() => setStep(step - 1)} className="border border-gray-600 text-gray-600 px-6 py-2 rounded-lg">Back</button>
+            <button
+              onClick={() => setStep(step - 1)}
+              className="border border-gray-600 text-gray-600 px-6 py-2 rounded-lg"
+            >
+              Back
+            </button>
           )}
-          <button onClick={() => setStep(step < 2 ? step + 1 : step)} className="bg-green-600 text-white px-6 py-2 rounded-lg">
+          <button
+            onClick={step === 1 ? handleNext : () => alert("Form submitted!")}
+            className={`bg-green-600 text-white px-6 py-2 rounded-lg ${!validateForm() && "opacity-50 cursor-not-allowed"}`}
+            disabled={!validateForm()}
+          >
             {step === 1 ? "Next" : "Submit"}
           </button>
         </div>
